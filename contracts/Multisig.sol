@@ -49,10 +49,7 @@ contract Multisig is Initializable {
     }
 
     modifier quorumIsValid(uint256 adminsCount_, uint256 quorum_) {
-        require(
-            quorum_ <= adminsCount_ && quorum_ != 0 && adminsCount_ != 0,
-            "invalid quorum"
-        );
+        require(quorum_ <= adminsCount_ && quorum_ != 0, "invalid quorum");
         _;
     }
 
@@ -88,15 +85,16 @@ contract Multisig is Initializable {
 
     function removeAdmin(address admin_) external onlySelf onlyAdmin(admin_) {
         isAdmin[admin_] = false;
-        for (uint256 i = 0; i < admins.length - 1; i++) {
+        uint256 length = admins.length;
+        for (uint256 i = 0; i < length - 1; i++) {
             if (admins[i] == admin_) {
-                admins[i] = admins[admins.length - 1];
+                admins[i] = admins[length - 1];
                 break;
             }
         }
         admins.pop();
-        if (quorum > admins.length) {
-            setQuorum(uint128(admins.length));
+        if (quorum > length - 1) {
+            setQuorum(uint128(length - 1));
         }
         emit AdminRemoval(admin_);
     }
